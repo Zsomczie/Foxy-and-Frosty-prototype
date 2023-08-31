@@ -4,41 +4,44 @@ using UnityEngine;
 
 public class FoxController : MonoBehaviour
 {
-    private CharacterController controller;
-    private Vector3 playerVelocity;
-    private bool groundedPlayer;
-    private float playerSpeed = 6.0f;
-    private float jumpHeight = 1.0f;
-    private float gravityValue = -9.81f;
-
-    private void Start()
+    public CharacterController controller;
+    public float speed = 5f;
+    public float sprintspeed = 10f;
+    public List<int> hello = new List<int>();
+    public int[] array = new int[4];
+    public Vector3 movement;
+    public float jumpSpeed = 8.0F;
+    public float gravity = 15.0F;
+    private Vector3 moveDirection = Vector3.zero;
+    // Start is called before the first frame update
+    void Start()
     {
-        controller = gameObject.GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
     }
 
+    // Update is called once per frame
     void Update()
     {
-        groundedPlayer = controller.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0)
+        float x = Input.GetAxis("Horizontal");
+        float y = Input.GetAxis("Vertical");
+        Vector3 move = transform.right * x + transform.forward * y;
+        move.Normalize();
+        movement = transform.right * x + transform.forward * y;
+        movement *= speed;
+        if (controller.isGrounded && Input.GetButton("Jump"))
         {
-            playerVelocity.y = 0f;
+            moveDirection.y = jumpSpeed;
         }
-
-        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        controller.Move(move * Time.deltaTime * playerSpeed);
-
-        if (move != Vector3.zero)
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            gameObject.transform.forward = move;
+            controller.Move(move * sprintspeed * Time.deltaTime);
         }
-
-        // Changes the height position of the player..
-        if (Input.GetButtonDown("Jump") && groundedPlayer)
+        else
         {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+            controller.Move(move * speed * Time.deltaTime);
         }
+        moveDirection.y -= gravity * Time.deltaTime;
+        controller.Move(moveDirection * Time.deltaTime);
 
-        playerVelocity.y += gravityValue * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
     }
 }
