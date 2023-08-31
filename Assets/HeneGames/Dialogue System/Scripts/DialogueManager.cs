@@ -28,7 +28,7 @@ namespace HeneGames.DialogueSystem
 
         [Header("Dialogue")]
         [SerializeField] private TriggerState triggerState;
-        [SerializeField] private List<NPC_Centence> sentences = new List<NPC_Centence>();
+        [SerializeField] public List<NPC_Centence> sentences = new List<NPC_Centence>();
 
         private void Update()
         {
