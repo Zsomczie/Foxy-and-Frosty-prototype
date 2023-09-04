@@ -8,7 +8,8 @@ public class FoxMove : MonoBehaviour
     public float Speed;
     public Transform Cam;
     public float gravity = 15.0F;
-    [SerializeField] Animator animator;
+    [SerializeField] public Animator animator;
+    public List<AnimatorControllerParameter> animatorBools = new List<AnimatorControllerParameter>();
     [SerializeField] float x;
     [SerializeField] float y;
     [SerializeField] CameraMove cameraMove;
@@ -19,12 +20,22 @@ public class FoxMove : MonoBehaviour
     public LayerMask layerMask;
     public float jumpforce = 10f;
     public float timer = 0f;
+    [SerializeField] bool enableGravity=true;
+    [SerializeField] float jumpSpeed = 10f;
+    Vector3 Jump = new Vector3(0, 0, 0);
     // Start is called before the first frame update
     void Start()
     {
         Controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         cameraMove = GetComponentInChildren<CameraMove>();
+        foreach (AnimatorControllerParameter item in animator.parameters)
+        {
+            if (item.type==AnimatorControllerParameterType.Bool)
+            {
+                animatorBools.Add(item);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -34,77 +45,90 @@ public class FoxMove : MonoBehaviour
         float Vertical = Input.GetAxis("Vertical") * Speed * Time.deltaTime;
         y= Input.GetAxis("Vertical") * Speed * Time.deltaTime;
         x= Input.GetAxis("Horizontal") * Speed * Time.deltaTime;
-        if (Horizontal==0&&Vertical==0&&cameraMove.X==0)
+        if (GroundCheck())
         {
-            animator.SetBool("RunLeft", false);
-            animator.SetBool("RunRight", false);
-            animator.SetBool("Run", false);
-            animator.SetBool("RunBack", false);
-            animator.SetBool("Idle", true);
-            timer++;
-            if (timer>400&&animator.GetBool("CanSit")!=true)
+            animator.SetBool("Jump", false);
+
+            if (Horizontal == 0 && Vertical == 0 && cameraMove.X == 0)
             {
-                animator.SetBool("CanSit", true);
-            }
-        }
-        else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
-        {
-            if (cameraMove.X > 0.05)
-            {
-                timer = 0;
-                animator.SetBool("Idle", false);
-                animator.SetBool("Run", false);
-                animator.SetBool("CanSit", false);
-                animator.SetBool("RunLeft", false);
-                animator.SetBool("RunRight", true);
-            }
-            if (cameraMove.X < -0.05)
-            {
-                timer = 0;
-                animator.SetBool("Idle", false);
-                animator.SetBool("Run", false);
-                animator.SetBool("CanSit", false);
-                animator.SetBool("RunLeft", true);
-                animator.SetBool("RunRight", false);
-            }
-        }
-        if (Vertical>0 || Horizontal>0||Horizontal<0)
-        {
-            if (cameraMove.X==0)
-            {
-                timer = 0;
                 animator.SetBool("RunLeft", false);
                 animator.SetBool("RunRight", false);
-                animator.SetBool("CanSit", false);
+                animator.SetBool("Run", false);
                 animator.SetBool("RunBack", false);
+                animator.SetBool("Idle", true);
+                timer++;
+                if (timer > 400 && animator.GetBool("CanSit") != true)
+                {
+                    animator.SetBool("CanSit", true);
+                }
+            }
+            else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
+            {
+                if (cameraMove.X > 0.05)
+                {
+                    timer = 0;
+                    animator.SetBool("Idle", false);
+                    animator.SetBool("Run", false);
+                    animator.SetBool("CanSit", false);
+                    animator.SetBool("RunLeft", false);
+                    animator.SetBool("RunRight", true);
+                }
+                if (cameraMove.X < -0.05)
+                {
+                    timer = 0;
+                    animator.SetBool("Idle", false);
+                    animator.SetBool("Run", false);
+                    animator.SetBool("CanSit", false);
+                    animator.SetBool("RunLeft", true);
+                    animator.SetBool("RunRight", false);
+                }
+            }
+            if (Vertical > 0 || Horizontal > 0 || Horizontal < 0)
+            {
+                if (cameraMove.X == 0)
+                {
+                    timer = 0;
+                    animator.SetBool("RunLeft", false);
+                    animator.SetBool("RunRight", false);
+                    animator.SetBool("CanSit", false);
+                    animator.SetBool("RunBack", false);
+                    animator.SetBool("Idle", false);
+                    animator.SetBool("Run", true);
+                }
+
+                else if (cameraMove.X > 0.05)
+                {
+                    timer = 0;
+                    animator.SetBool("Run", false);
+                    animator.SetBool("CanSit", false);
+                    animator.SetBool("RunLeft", false);
+                    animator.SetBool("RunRight", true);
+                }
+                else if (cameraMove.X < -0.05)
+                {
+                    timer = 0;
+                    animator.SetBool("Run", false);
+                    animator.SetBool("CanSit", false);
+                    animator.SetBool("RunLeft", true);
+                    animator.SetBool("RunRight", false);
+                }
+            }
+            else if (Vertical < 0)
+            {
+                timer = 0;
+                animator.SetBool("CanSit", false);
                 animator.SetBool("Idle", false);
-                animator.SetBool("Run", true);
-            }
-            
-            else if (cameraMove.X > 0.05)
-            {
-                timer = 0;
                 animator.SetBool("Run", false);
-                animator.SetBool("CanSit", false);
-                animator.SetBool("RunLeft", false);
-                animator.SetBool("RunRight", true);
-            }
-            else if (cameraMove.X < -0.05)
-            {
-                timer = 0;
-                animator.SetBool("Run", false);
-                animator.SetBool("CanSit", false);
-                animator.SetBool("RunLeft", true);
-                animator.SetBool("RunRight", false);
+                animator.SetBool("RunBack", true);
             }
         }
-        else if (Vertical < 0)
+        else if (!GroundCheck())
         {
-            timer = 0;
-            animator.SetBool("CanSit", false);
-            animator.SetBool("Idle", false);
-            animator.SetBool("Run", false);
-            animator.SetBool("RunBack", true);
+            foreach (AnimatorControllerParameter item in animatorBools)
+            {
+                animator.SetBool(item.name, false);
+            }
+            animator.SetBool("Jump",true);
         }
         //else
         //{
@@ -113,16 +137,23 @@ public class FoxMove : MonoBehaviour
         //}
         
         Vector3 Movement = Cam.transform.right * Horizontal + Cam.transform.forward * Vertical;
-        if (GroundCheck())
-        {
-            Debug.Log("lol");
-        }
+        Vector3 MovementJump = new Vector3(0, 0, 0);
         //Movement.Normalize();
         if (GroundCheck()&&Input.GetButton("Jump"))
         {
-            Movement.y += jumpforce;
+            MovementJump.y = jumpforce;
+            Jump = MovementJump;
+            Debug.Log("hi");
+            
+            enableGravity = false;
+            StartCoroutine(disableGravity());
         }
-        Movement.y -= gravity * Time.deltaTime;
+        else if (enableGravity)
+        {
+            Jump.y -= gravity * Time.deltaTime;
+        }
+        Controller.Move(Jump * Time.deltaTime*jumpSpeed);
+
         //if (cameraMove.X != 0)
         //{
         //    timer = 0;
@@ -175,6 +206,7 @@ public class FoxMove : MonoBehaviour
         //    animator.SetBool("RunRight", false);
         //    animator.SetBool("Idle", true);
         //}
+
         Controller.Move(Movement);
         if (Movement.magnitude != 0f)
         {
@@ -201,6 +233,13 @@ public class FoxMove : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawCube(fox.position - fox.forward * maxDistance, boxSize);
+    }
+    IEnumerator disableGravity()
+    {
+        enableGravity = false;
+        yield return new WaitForSeconds(0.2f);
+        animator.SetBool("Jump", false);
+        enableGravity = true;
     }
 
 }
