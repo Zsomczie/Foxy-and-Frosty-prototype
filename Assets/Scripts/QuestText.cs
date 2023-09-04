@@ -38,6 +38,16 @@ public class QuestText : MonoBehaviour
         StartCoroutine(WriteTextToTextmesh("Quest Finished: Find Bunny's flower", questText));
         StartCoroutine(disappear());
     }
+    public void StartWhale()
+    {
+        StartCoroutine(WriteTextToTextmesh("Quest Started: Help the Whale", questText));
+        StartCoroutine(disappear());
+    }
+    public void EndWhale()
+    {
+        StartCoroutine(WriteTextToTextmesh("Quest Finished: Help the Whale\nNew Skill acquired: Swimming", questText));
+        StartCoroutine(disappear());
+    }
     IEnumerator WriteTextToTextmesh(string _text, TextMeshProUGUI _textMeshObject)
     {
         _textMeshObject.text = "";

@@ -12,6 +12,7 @@ public class Flower : MonoBehaviour
     void Start()
     {
         interaction = GetComponent<Interaction>();
+        foxItems = GameObject.Find("Fox").GetComponent<FoxItems>();
     }
 
     // Update is called once per frame

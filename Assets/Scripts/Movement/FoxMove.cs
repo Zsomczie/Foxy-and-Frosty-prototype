@@ -23,6 +23,8 @@ public class FoxMove : MonoBehaviour
     [SerializeField] bool enableGravity=true;
     [SerializeField] float jumpSpeed = 10f;
     Vector3 Jump = new Vector3(0, 0, 0);
+    bool sprinting;
+    public bool canSwim = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -61,6 +63,16 @@ public class FoxMove : MonoBehaviour
                 {
                     animator.SetBool("CanSit", true);
                 }
+            }
+            if (Input.GetKey(KeyCode.LeftShift)&&!sprinting)
+            {
+                sprinting = true;
+                Speed = 5;
+            }
+            else
+            {
+                Speed = 4;
+                sprinting = false;
             }
             //else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
             //{
