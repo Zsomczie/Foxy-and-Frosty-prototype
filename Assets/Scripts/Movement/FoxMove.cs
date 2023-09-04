@@ -14,6 +14,11 @@ public class FoxMove : MonoBehaviour
     [SerializeField] CameraMove cameraMove;
     [SerializeField]Transform fox;
     float rotation;
+    public Vector3 boxSize;
+    public float maxDistance;
+    public LayerMask layerMask;
+    public float jumpforce = 10f;
+    public float timer = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,47 +36,116 @@ public class FoxMove : MonoBehaviour
         x= Input.GetAxis("Horizontal") * Speed * Time.deltaTime;
         if (Horizontal==0&&Vertical==0&&cameraMove.X==0)
         {
+            animator.SetBool("RunLeft", false);
+            animator.SetBool("RunRight", false);
             animator.SetBool("Run", false);
             animator.SetBool("RunBack", false);
             animator.SetBool("Idle", true);
-
+            timer++;
+            if (timer>400&&animator.GetBool("CanSit")!=true)
+            {
+                animator.SetBool("CanSit", true);
+            }
         }
-        if (Vertical>0||Horizontal>0||Horizontal<0)
+        else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
         {
-            animator.SetBool("RunBack", false);
-            animator.SetBool("Idle", false);
-            animator.SetBool("Run", true);
-        }
-        if (Vertical<0)
-        {
-            animator.SetBool("Idle", false);
-            animator.SetBool("Run", false);
-            animator.SetBool("RunBack", true);
-        }
-        Vector3 Movement = Cam.transform.right * Horizontal + Cam.transform.forward * Vertical;
-        Movement.y -= gravity*Time.deltaTime;
-        if (cameraMove.X != 0)
-        {
-
-            animator.SetBool("Idle", false);
-            animator.SetBool("Run", false);
-            animator.SetBool("RunBack", false);
             if (cameraMove.X > 0.05)
             {
+                timer = 0;
+                animator.SetBool("Idle", false);
+                animator.SetBool("Run", false);
+                animator.SetBool("CanSit", false);
                 animator.SetBool("RunLeft", false);
                 animator.SetBool("RunRight", true);
             }
             if (cameraMove.X < -0.05)
             {
+                timer = 0;
+                animator.SetBool("Idle", false);
+                animator.SetBool("Run", false);
+                animator.SetBool("CanSit", false);
                 animator.SetBool("RunLeft", true);
                 animator.SetBool("RunRight", false);
             }
         }
-        else
+        if (Vertical>0 || Horizontal>0||Horizontal<0)
         {
-            animator.SetBool("RunLeft", false);
-            animator.SetBool("RunRight", false);
+            if (cameraMove.X==0)
+            {
+                timer = 0;
+                animator.SetBool("RunLeft", false);
+                animator.SetBool("RunRight", false);
+                animator.SetBool("CanSit", false);
+                animator.SetBool("RunBack", false);
+                animator.SetBool("Idle", false);
+                animator.SetBool("Run", true);
+            }
+            
+            else if (cameraMove.X > 0.05)
+            {
+                timer = 0;
+                animator.SetBool("Run", false);
+                animator.SetBool("CanSit", false);
+                animator.SetBool("RunLeft", false);
+                animator.SetBool("RunRight", true);
+            }
+            else if (cameraMove.X < -0.05)
+            {
+                timer = 0;
+                animator.SetBool("Run", false);
+                animator.SetBool("CanSit", false);
+                animator.SetBool("RunLeft", true);
+                animator.SetBool("RunRight", false);
+            }
         }
+        else if (Vertical < 0)
+        {
+            timer = 0;
+            animator.SetBool("CanSit", false);
+            animator.SetBool("Idle", false);
+            animator.SetBool("Run", false);
+            animator.SetBool("RunBack", true);
+        }
+        //else
+        //{
+        //    animator.SetBool("RunLeft", false);
+        //    animator.SetBool("RunRight", false);
+        //}
+        
+        Vector3 Movement = Cam.transform.right * Horizontal + Cam.transform.forward * Vertical;
+        if (GroundCheck())
+        {
+            Debug.Log("lol");
+        }
+        //Movement.Normalize();
+        if (GroundCheck()&&Input.GetButton("Jump"))
+        {
+            Movement.y += jumpforce;
+        }
+        Movement.y -= gravity * Time.deltaTime;
+        //if (cameraMove.X != 0)
+        //{
+        //    timer = 0;
+        //    animator.SetBool("CanSit", false);
+        //    animator.SetBool("Idle", false);
+        //    //animator.SetBool("Run", false);
+        //    animator.SetBool("RunBack", false); 
+        //}
+        //    if (cameraMove.X > 0.05)
+        //    {
+        //        timer = 0;
+        //        animator.SetBool("CanSit", false);
+        //        animator.SetBool("RunLeft", false);
+        //        animator.SetBool("RunRight", true);
+        //    }
+        //    if (cameraMove.X < -0.05)
+        //    {
+        //        timer = 0;
+        //        animator.SetBool("CanSit", false);
+        //        animator.SetBool("RunLeft", true);
+        //        animator.SetBool("RunRight", false);
+        //    }
+        //}
         //if (Horizontal!=0||Vertical!=0)
         //{
         //    animator.SetBool("Idle", false);
@@ -111,6 +185,22 @@ public class FoxMove : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, CamRotation, 0.1f);
 
         }
+    }
+    bool GroundCheck()
+    {
+        if (Physics.CheckSphere(fox.position,boxSize.x,layerMask,QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(fox.position - fox.forward * maxDistance, boxSize);
     }
 
 }
