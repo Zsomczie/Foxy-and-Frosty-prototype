@@ -62,27 +62,27 @@ public class FoxMove : MonoBehaviour
                     animator.SetBool("CanSit", true);
                 }
             }
-            else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
-            {
-                if (cameraMove.X > 0.05)
-                {
-                    timer = 0;
-                    animator.SetBool("Idle", false);
-                    animator.SetBool("Run", false);
-                    animator.SetBool("CanSit", false);
-                    animator.SetBool("RunLeft", false);
-                    animator.SetBool("RunRight", true);
-                }
-                if (cameraMove.X < -0.05)
-                {
-                    timer = 0;
-                    animator.SetBool("Idle", false);
-                    animator.SetBool("Run", false);
-                    animator.SetBool("CanSit", false);
-                    animator.SetBool("RunLeft", true);
-                    animator.SetBool("RunRight", false);
-                }
-            }
+            //else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
+            //{
+            //    if (cameraMove.X > 0.05)
+            //    {
+            //        timer = 0;
+            //        animator.SetBool("Idle", false);
+            //        animator.SetBool("Run", false);
+            //        animator.SetBool("CanSit", false);
+            //        animator.SetBool("RunLeft", false);
+            //        animator.SetBool("RunRight", true);
+            //    }
+            //    if (cameraMove.X < -0.05)
+            //    {
+            //        timer = 0;
+            //        animator.SetBool("Idle", false);
+            //        animator.SetBool("Run", false);
+            //        animator.SetBool("CanSit", false);
+            //        animator.SetBool("RunLeft", true);
+            //        animator.SetBool("RunRight", false);
+            //    }
+            //}
             if (Vertical > 0 || Horizontal > 0 || Horizontal < 0)
             {
                 if (cameraMove.X == 0)
@@ -207,7 +207,7 @@ public class FoxMove : MonoBehaviour
         //    animator.SetBool("Idle", true);
         //}
 
-        Controller.Move(Movement);
+        Controller.Move(Movement*Speed);
         if (Movement.magnitude != 0f)
         {
             transform.Rotate(Vector3.up * Input.GetAxis("Mouse X") * Cam.GetComponent<CameraMove>().sensivity * Time.deltaTime);

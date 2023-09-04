@@ -5,7 +5,7 @@ using UnityEngine;
 public class Interaction : MonoBehaviour
 {
     [SerializeField] bool isActive = false;
-    [SerializeField] bool used = false;
+    [SerializeField] public bool used = false;
     // Start is called before the first frame update
     void Start()
     {
