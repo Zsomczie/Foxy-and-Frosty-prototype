@@ -114,7 +114,7 @@ namespace HeneGames.DialogueSystem
             interactionUI.SetActive(_value);
         }
 
-        IEnumerator WriteTextToTextmesh(string _text, TextMeshProUGUI _textMeshObject)
+        public IEnumerator WriteTextToTextmesh(string _text, TextMeshProUGUI _textMeshObject)
         {
             _textMeshObject.text = "";
             char[] _letters = _text.ToCharArray();
