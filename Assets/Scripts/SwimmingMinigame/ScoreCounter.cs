@@ -34,7 +34,7 @@ public class ScoreCounter : MonoBehaviour
     }
     public void BackToMain()
     {
-        //SceneManager.LoadScene("TopDown");
+        SceneManager.LoadScene("FAE_Demo1");
 
     }
     public void ResetScene()

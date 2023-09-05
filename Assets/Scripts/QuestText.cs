@@ -10,9 +10,10 @@ public class QuestText : MonoBehaviour
     TextMeshProUGUI questText;
     [SerializeField] float textAnimationSpeed;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         questText = GetComponent<TextMeshProUGUI>();
+        questText.text = "";
     }
 
     // Update is called once per frame
@@ -69,15 +70,17 @@ public class QuestText : MonoBehaviour
         yield return new WaitForSeconds(8f);
         questText.text = "";
     }
-<<<<<<< Updated upstream
     public void StartSwimming()
     {
         SceneManager.LoadScene("SwimmingMinigame");
-=======
+    }
     IEnumerator Success()
     {
         yield return new WaitForSeconds(1f);
         GetComponent<AudioSource>().Play();
->>>>>>> Stashed changes
+    }
+    private void OnLevelWasLoaded(int level)
+    {
+        questText.text = "";
     }
 }

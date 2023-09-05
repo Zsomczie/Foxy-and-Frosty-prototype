@@ -1,5 +1,7 @@
+using HeneGames.DialogueSystem;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FoxMove : MonoBehaviour
@@ -17,7 +19,8 @@ public class FoxMove : MonoBehaviour
     float rotation;
     public Vector3 boxSize;
     public float maxDistance;
-    public LayerMask layerMask;
+    public LayerMask GroundLayerMask;
+    public LayerMask WaterLayerMask;
     public float jumpforce = 10f;
     public float timer = 0f;
     [SerializeField] bool enableGravity=true;
@@ -25,9 +28,12 @@ public class FoxMove : MonoBehaviour
     Vector3 Jump = new Vector3(0, 0, 0);
     bool sprinting;
     public bool canSwim = false;
+    [SerializeField] GameObject diaUI;
     // Start is called before the first frame update
     void Start()
     {
+        diaUI = Resources.FindObjectsOfTypeAll<DialogueUI>().First().gameObject;
+        diaUI.SetActive(true);
         Controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         cameraMove = GetComponentInChildren<CameraMove>();
@@ -67,11 +73,13 @@ public class FoxMove : MonoBehaviour
             if (Input.GetKey(KeyCode.LeftShift)&&!sprinting)
             {
                 sprinting = true;
+                animator.speed = 1.4f;
                 Speed = 5;
             }
             else
             {
                 Speed = 4;
+                animator.speed = 1f;
                 sprinting = false;
             }
             //else if (Horizontal == 0 && Vertical == 0 && cameraMove.X != 0)
@@ -95,7 +103,19 @@ public class FoxMove : MonoBehaviour
             //        animator.SetBool("RunRight", false);
             //    }
             //}
-            if (Vertical > 0 || Horizontal > 0 || Horizontal < 0)
+            if (!WaterCheck())
+            {
+                animator.speed = 1;
+            }
+            if (Vertical==0&&Horizontal==0)
+            {
+                foreach (AnimatorControllerParameter item in animatorBools)
+                {
+                    animator.SetBool(item.name, false);
+                }
+                animator.SetBool("Idle", true);
+            }
+            else if (Vertical > 0 || Horizontal > 0 || Horizontal < 0)
             {
                 if (cameraMove.X == 0)
                 {
@@ -133,6 +153,15 @@ public class FoxMove : MonoBehaviour
                 animator.SetBool("Run", false);
                 animator.SetBool("RunBack", true);
             }
+        }
+        else if (WaterCheck())
+        {
+            foreach (AnimatorControllerParameter item in animatorBools)
+            {
+                animator.SetBool(item.name, false);
+            }
+            animator.SetBool("Run", true);
+            animator.speed = 0.5f;
         }
         else if (!GroundCheck())
         {
@@ -232,7 +261,7 @@ public class FoxMove : MonoBehaviour
     }
     bool GroundCheck()
     {
-        if (Physics.CheckSphere(fox.position,boxSize.x,layerMask,QueryTriggerInteraction.Ignore))
+        if (Physics.CheckSphere(fox.position,boxSize.x,GroundLayerMask,QueryTriggerInteraction.Ignore))
         {
             return true;
         }
@@ -253,5 +282,15 @@ public class FoxMove : MonoBehaviour
         animator.SetBool("Jump", false);
         enableGravity = true;
     }
-
+    bool WaterCheck()
+    {
+        if (Physics.CheckSphere(fox.position, boxSize.x, WaterLayerMask, QueryTriggerInteraction.Ignore))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
