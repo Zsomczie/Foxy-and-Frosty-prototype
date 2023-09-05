@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class QuestText : MonoBehaviour
 {
@@ -65,5 +66,9 @@ public class QuestText : MonoBehaviour
     {
         yield return new WaitForSeconds(8f);
         questText.text = "";
+    }
+    public void StartSwimming()
+    {
+        SceneManager.LoadScene("SwimmingMinigame");
     }
 }
