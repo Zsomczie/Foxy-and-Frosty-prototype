@@ -36,6 +36,7 @@ public class QuestText : MonoBehaviour
     }
     public void EndFlower()
     {
+        StartCoroutine(Success());
         StartCoroutine(WriteTextToTextmesh("Quest Finished: Find Bunny's flower", questText));
         StartCoroutine(disappear());
     }
@@ -46,6 +47,7 @@ public class QuestText : MonoBehaviour
     }
     public void EndWhale()
     {
+        StartCoroutine(Success());
         StartCoroutine(WriteTextToTextmesh("Quest Finished: Help the Whale\nNew Skill acquired: Swimming", questText));
         StartCoroutine(disappear());
     }
@@ -67,8 +69,15 @@ public class QuestText : MonoBehaviour
         yield return new WaitForSeconds(8f);
         questText.text = "";
     }
+<<<<<<< Updated upstream
     public void StartSwimming()
     {
         SceneManager.LoadScene("SwimmingMinigame");
+=======
+    IEnumerator Success()
+    {
+        yield return new WaitForSeconds(1f);
+        GetComponent<AudioSource>().Play();
+>>>>>>> Stashed changes
     }
 }
